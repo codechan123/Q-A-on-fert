@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Layui</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="../static/js/layui/css/layui.css"  media="all">
+  <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+	
+<div class="demoTable">
+  搜索用户名称：
+  <div class="layui-inline">
+    <input class="layui-input" name="id" id="demoReload" autocomplete="off">
+  </div>
+  <button class="layui-btn" data-type="reload">搜索</button>
+</div> 
+<table class="layui-hide" id="test" lay-filter="test"></table>
+
+<script type="text/html" id="addData">
+  <div class="layui-btn-container">
+    <button class="layui-btn layui-btn-sm" lay-event="add"><i class="layui-icon">&#xe654;</i>添加用户</button>
+  </div>
+</script>
+
+<script type="text/html" id="barDemo">
+  <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+  <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+              
+          
+<script src="../static/js/layui/layui.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述 JS 路径需要改成你本地的 --> 
+ 
+<script>
+layui.use('table', function(){
+  var table = layui.table;
+  
+  table.render({
+    elem: '#test'
+    ,url:'http://101.42.154.161:5000/user'
+    ,toolbar: '#addData' //开启头部工具栏，并为其绑定左侧模板
+    ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+      title: '提示'
+      ,layEvent: 'LAYTABLE_TIPS'
+      ,icon: 'layui-icon-tips'
+    }]
+    ,title: '目信息表'
+    ,cols: [[
+      {type: 'checkbox', fixed: 'left'}
+      ,{field:'username', title:'用户名', width:130, fixed: 'left', sort: true}
+      ,{field:'password', title:'密码', width:120}
+      ,{field:'phone', title:'电话', width:120}
+      ,{field:'email', title:'邮箱', width:120}
+      ,{fixed: 'right', title:'操作', toolbar: '#barDemo', width:200}
+    ]]
+    ,page: true
+    ,parseData:function(res){
+    	return{
+    		"code":res.status,
+    		"msg":res.message,
+    		"count":res.total,
+    		"data":res.rows
+    	}
+    }
+    ,id: 'testReload'
+  });
+  
+  //头工具栏事件
+  table.on('toolbar(test)', function(obj){
+    var checkStatus = table.checkStatus(obj.config.id);
+    switch(obj.event){
+     
+      //自定义头工具栏右侧图标 - 提示
+      case 'LAYTABLE_TIPS':
+        layer.alert('这是工具栏右侧自定义的一个图标按钮');
+      break;
+      case 'add':
+      	var html = '<div style="width:100%;text-align:center">'
+									+'<form class="layui-form" action="http://101.42.154.161:5000/addUser">'
+									+'<div class="layui-form-item">'
+									+'<div class="layui-inline">'
+									+'<label class="layui-form-label">用户名</label>'
+									+'<div class="layui-input-inline">'
+									+'<input type="text" name="name" required lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">'
+									+'</div>'
+									+'</div>'
+									+'</div>'
+									+'<div class="layui-form-item">'
+									+'<div class="layui-inline">'
+									+'<label class="layui-form-label">密码</label>'
+									+'<div class="layui-input-inline">'
+									+'<input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">'
+									+'</div>'
+									+'</div>'
+									+'</div>'
+									+'<div class="layui-form-item">'
+									+'<div class="layui-inline">'
+									+'<label class="layui-form-label">电话</label>'
+									+'<div class="layui-input-inline">'
+									+'<input type="tel" name="tel" required lay-verify="required" placeholder="请输入电话" autocomplete="off" class="layui-input">'
+									+'</div>'
+									+'</div>'
+									+'</div>'
+									+'<div class="layui-form-item">'
+									+'<div class="layui-inline">'
+									+'<label class="layui-form-label">邮箱</label>'
+									+'<div class="layui-input-inline">'
+									+'<input type="email" name="email" required lay-verify="required" placeholder="请输入邮箱" autocomplete="off" class="layui-input">'
+									+'</div>'
+									+'</div>'
+									+'</div>'
+									+'<div class="layui-form-item">'
+									+'<div class="layui-input-block">'
+									+'<button class="layui-btn" lay-submit lay-filter="formDemo">添加</button>'
+									+'<button type="reset" class="layui-btn layui-btn-primary">重置</button>'
+									+'</div>'
+									+'</div>'
+									+'</form>'
+									+'</div>';
+									layer.open({
+					          type:1,
+					          title:"添加用户数据",
+					          area: ['50%','50%'],
+					          content: html
+					      });
+
+      break;
+    };
+  });
+  
+  //监听行工具事件
+  table.on('tool(test)', function(obj){
+    var data = obj.data;
+    if(obj.event === 'del'){
+      layer.confirm('真的删除行么', function(index){
+        //obj.del();
+        layer.close(index);
+        $.ajax({
+								url: "http://101.42.154.161:5000/deleteUser",
+								type: "POST",
+								data:{"username":data.username,"password":data.password,"phone":data.phone,"email":data.email},
+								dataType: "json",
+								success: function(data){
+									if(data['status']=="success"){
+										layer.alert("删除成功",{icon:6});
+										setTimeout(function(){
+											window.location.href="http://101.42.154.161:5000/userHTML";
+										},1500);
+										}
+									else{
+										layer.alert("删除失败",{icon:5});
+									}
+								}
+						});
+      }); 
+    } else if(obj.event === 'edit'){
+    	$.ajax({
+								url: "http://101.42.154.161:5000/preEditUser",
+								type: "POST",
+								data:{"name":data.username,"password":data.password,"tel":data.phone,"email":data.email},
+								dataType: "json",
+								success: function(data){
+									var html = '<div style="width:100%;text-align:center">'
+									+'<form class="layui-form" action="http://101.42.154.161:5000/editUser">'
+									+'<div class="layui-form-item">'
+									+'<div class="layui-inline">'
+									+'<label class="layui-form-label">用户名</label>'
+									+'<div class="layui-input-inline">'
+									+'<input type="text" name="name" value="'+data.name+'" required lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">'
+									+'</div>'
+									+'</div>'
+									+'</div>'
+									+'<div class="layui-form-item">'
+									+'<div class="layui-inline">'
+									+'<label class="layui-form-label">密码</label>'
+									+'<div class="layui-input-inline">'
+									+'<input type="text" name="password" value="'+data.password+'" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">'
+									+'</div>'
+									+'</div>'
+									+'</div>'
+									+'<div class="layui-form-item">'
+									+'<div class="layui-inline">'
+									+'<label class="layui-form-label">电话</label>'
+									+'<div class="layui-input-inline">'
+									+'<input type="tel" name="tel" value="'+data.tel+'" required lay-verify="required" placeholder="请输入电话" autocomplete="off" class="layui-input">'
+									+'</div>'
+									+'</div>'
+									+'</div>'
+									+'<div class="layui-form-item">'
+									+'<div class="layui-inline">'
+									+'<label class="layui-form-label">邮箱</label>'
+									+'<div class="layui-input-inline">'
+									+'<input type="email" name="email" value="'+data.email+'" required lay-verify="required" placeholder="请输入邮箱" autocomplete="off" class="layui-input">'
+									+'</div>'
+									+'</div>'
+									+'</div>'
+									+'<input type="hidden" name="oldName" value="'+data.name+'"/>'
+									+'<input type="hidden" name="oldPassword" value="'+data.password+'"/>'
+									+'<input type="hidden" name="oldTel" value="'+data.tel+'"/>'
+									+'<input type="hidden" name="oldEmail" value="'+data.email+'"/>'
+									+'<div class="layui-form-item">'
+									+'<div class="layui-input-block">'
+									+'<button class="layui-btn" lay-submit lay-filter="formDemo">修改</button>'
+									+'<button type="reset" class="layui-btn layui-btn-primary">重置</button>'
+									+'</div>'
+									+'</div>'
+									+'</form>'
+									+'</div>';
+									layer.open({
+					          type:1,
+					          title:"编辑用户数据",
+					          area: ['50%','50%'],
+					          content: html
+					       });
+								}
+						});
+    }
+    
+  });
+  
+  //搜索
+  var $ = layui.$, active = {
+    reload: function(){
+      var demoReload = $('#demoReload');
+      
+      //执行重载
+      table.reload('testReload', {
+        page: {
+          curr: 1 //重新从第 1 页开始
+        }
+        ,where: {
+          key: {
+            username: demoReload.val()
+          }
+        }
+      });
+    }
+  };
+  
+  $('.demoTable .layui-btn').on('click', function(){
+    var type = $(this).data('type');
+    active[type] ? active[type].call(this) : '';
+  });
+  
+  
+});
+</script>
+
+</body>
+</html>

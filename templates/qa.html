@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>问答系统</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link rel="stylesheet" href="../static/layui/lib/layui-v2.5.5/css/layui.css" media="all">
+		<link rel="stylesheet" href="../static/layui/lib/font-awesome-4.7.0/css/font-awesome.min.css" media="all">
+		<link rel="stylesheet" href="../static/layui/css/public.css" media="all">
+        <script src="https://cdn.staticfile.org/echarts/4.3.0/echarts.min.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+        <link rel="stylesheet" href="../static/css/qa.css">
+	</head>
+	<body>
+		<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+		  <legend style="font-size: 24px; font-weight: 400">肥料知识问答</legend>
+		</fieldset>
+		    <blockquote class="layui-elem-quote" style="font-size: 24px">
+		  常见问题示例：1. <a >玉米缺钾肥有什么症状？</a> 2. <a >小麦缺氮肥的防治方法？</a>3.<a>施可丰植物源系列肥料产品有哪些？</a>
+		</blockquote>
+		<form class="layui-form" action="http://101.42.154.161:5000/qa">
+		  <div class="layui-form-item">
+		    <div class="layui-input-block">
+		      <input type="text" name="question" lay-verify="title" autocomplete="off" placeholder="请输入问题" class="layui-input" value="{{ ctx.q }}" style="font-size: 24px; color:red">
+		    </div>
+		  </div>
+		     <div class="layui-form-item">
+		    <div class="layui-input-block">
+		      <button type="submit" class="layui-btn" lay-submit="" lay-filter="q">提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+		    </div>
+		  </div>
+		</form>
+		{% if ctx %}
+        <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+		  <legend style="font-size: 24px; font-weight: 400">答案展示</legend>
+		</fieldset>
+
+		<div style="padding: 20px; background-color: #F2F2F2;">
+		  <div class="layui-row layui-col-space15">
+		    <div class="layui-col-md12">
+		      <div class="layui-card">
+		        <div class="layui-card-header" style="font-size: 24px;">答案</div>
+		        <div class="layui-card-body" style="font-size: 24px">
+                    {{ ctx.a}}
+		        </div>
+		      </div>
+		    </div>
+          </div>
+
+		{% if ctx.b %}
+
+		<div class="layui-row layui-col-space15">
+		    <div class="layui-col-md12">
+		      <div class="layui-card">
+		        <div class="layui-card-header" style="font-size: 24px">知识图谱</div>
+		        <div class="layui-card-body">
+
+		 <div id="graph" style="width: 100%;height:400px"></div>
+		        </div>
+		      </div>
+		    </div>
+		
+		
+		  </div>
+		</div>
+        {%endif%}
+        {%endif%}
+		<script src="/static/layui/layui.js"></script>
+
+		<script>
+            data = [
+                {name:'{{ ctx.b }}',category:1,id:0},
+                {name:'{{ ctx.c }}',category:2,id:1},
+                {name:'{{ ctx.e }}',category:0,id:2}
+                ]
+            links = [
+                {source:0,target:1,category:0,value:'{{ ctx.d }}',symbolSize:4},
+                {source:1,target:2,category:0,value:'{{ ctx.f }}',symbolSize:4}
+            ]
+
+            var myChart = echarts.init(document.getElementById('graph'));
+
+            option = {
+                title: {
+                    text: ''
+                },
+                tooltip: {},
+                animationDurationUpdate: 1500,
+                animationEasingUpdate: 'quinticInOut',
+                label: {
+                    normal: {
+                        show: true,
+                        textStyle: {
+                            fontSize: 16
+                        },
+                    }
+                },
+                legend: {
+                    x: "center",
+                    show: true
+                },
+                series: [
+                    {
+                        type: 'graph',
+                        layout: 'force',
+                        symbolSize: 60,
+                        focusNodeAdjacency: true,
+                        roam: true,
+                        edgeSymbol: ['none', 'arrow'],
+                        categories: [{
+                            name: '实体1',
+                            itemStyle: {
+                                normal: {
+                                    color: "#C71585",
+                                }
+                            }
+                        },{
+                            name: '实体2',
+                            itemStyle: {
+                                normal: {
+                                    color: "#009800",
+                                }
+                            }
+                        },{
+                            name: '实体3',
+                            itemStyle: {
+                                normal: {
+                                    color: "#4592FF",
+                                }
+                            }
+                        }],
+                        label: {
+                            normal: {
+                                show: true,
+                                textStyle: {
+                                    fontSize: 16,
+                                },
+                            }
+                        },
+                        force: {
+                            repulsion: 1000,
+                            edgeLength: 160
+                        },
+                        edgeSymbolSize: [4, 50],
+                        edgeLabel: {
+                            normal: {
+                                show: true,
+                                textStyle: {
+                                    fontSize: 16
+                                },
+                                formatter: "{c}"
+                            }
+                        },
+                        data: data,
+                        links: links,
+                        lineStyle: {
+                            normal: {
+                                opacity: 0.8,
+                                width: 0.8,
+                                curveness: 0,
+                                color:"#262626",
+                            },
+                            emphasis:{
+                                width: 10
+                            }
+                        }
+                    }
+                ]
+            };
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+    </script>
+	</body>
+</html>

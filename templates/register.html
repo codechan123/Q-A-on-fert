@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>登录</title>
+		<link rel="stylesheet" href="../static/js/layui/css/layui.css" />
+		<link rel="stylesheet" href="../static/layui/css/login.css" />
+        <style>
+            .main-body {top:50%;left:50%;position:absolute;-webkit-transform:translate(-50%,-50%);-moz-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);-o-transform:translate(-50%,-50%);transform:translate(-50%,-50%);overflow:hidden;}
+             body {background:url(../static/layui/images/skf.png) 100% 50% / cover no-repeat;position:static;font-size:12px;}
+        </style>
+	</head>
+	<body>
+		<div id="content">
+			<canvas id="background"></canvas>
+			<div id="form">
+				<form class="layui-form" action="">
+					<div class="layui-form-item">
+			  			<label class="layui-form-label">用户名：</label>
+				    	<div class="layui-input-inline">
+				    		<i class="layui-icon">&#xe66f;</i>
+				      		<input type="text" name="username" required lay-verify="required" placeholder="请输入用户名" autocomplete="off" class="layui-input">
+				    	</div>
+			  		</div>
+			  		<div class="layui-form-item">
+			  			<label class="layui-form-label">密码：</label>
+				    	<div class="layui-input-inline">
+				    		<i class="layui-icon">&#xe673;</i>
+				      		<input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+				    	</div>
+			  		</div>
+			  		<div class="layui-form-item">
+			  			<label class="layui-form-label">电话：</label>
+				    	<div class="layui-input-inline">
+				    		<i class="layui-icon">&#xe678;</i>
+				      		<input type="tel" name="phone" required lay-verify="required" placeholder="请输入电话" autocomplete="off" class="layui-input">
+				    	</div>
+			  		</div>
+			  		<div class="layui-form-item">
+			  			<label class="layui-form-label">邮箱：</label>
+				    	<div class="layui-input-inline">
+				    		<i class="layui-icon">&#xe618;</i>
+				      		<input type="email" name="email" required lay-verify="required" placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+				    	</div>
+			  		</div>
+			  		<div class="layui-form-item">
+			  			<label class="layui-form-label">验证码：</label>
+				    	<div class="layui-input-inline">
+				      		<input type="text" name="verify" id="verify" lay-verify="required" placeholder="请输入验证码" autocomplete="off" class="layui-input">
+				      		<canvas id="canvas" width="92" height="32"></canvas>
+				      		
+				    	</div>
+			  		</div>
+			  		<div class="layui-form-item">
+					    <div class="layui-input-block">
+					      <button class="layui-btn" lay-submit lay-filter="formDemo">注册</button>
+					      <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+					    </div>
+					</div>
+				</form>
+			</div>
+			
+		</div>
+		<script type="text/javascript" src="../static/js/layui/layui.js" ></script>
+		<script>
+			var $ = layui.$;
+			var show_num = [];
+			$(function(){
+		        
+		        draw(show_num);
+		 
+		        $("#canvas").on('click',function(){
+		            draw(show_num);
+		        })
+		   	});
+		 
+		    function draw(show_num) {
+		        var canvas_width=$('#canvas').width();
+		        var canvas_height=$('#canvas').height();
+		        var canvas = document.getElementById("canvas");//获取到canvas的对象，演员
+		        var context = canvas.getContext("2d");//获取到canvas画图的环境，演员表演的舞台
+		        canvas.width = canvas_width;
+		        canvas.height = canvas_height;
+		        var sCode = "A,B,C,E,F,G,H,J,K,L,M,N,P,Q,R,S,T,W,X,Y,Z,1,2,3,4,5,6,7,8,9,0";
+		        var aCode = sCode.split(",");
+		        var aLength = aCode.length;//获取到数组的长度
+		        
+		        for (var i = 0; i <= 3; i++) {
+		            var j = Math.floor(Math.random() * aLength);//获取到随机的索引值
+		            var deg = Math.random() * 30 * Math.PI / 180;//产生0~30之间的随机弧度
+		            var txt = aCode[j];//得到随机的一个内容
+		            show_num[i] = txt.toLowerCase();
+		            var x = 10 + i * 20;//文字在canvas上的x坐标
+		            var y = 20 + Math.random() * 8;//文字在canvas上的y坐标
+		            context.font = "bold 23px 微软雅黑";
+		 
+		            context.translate(x, y);
+		            context.rotate(deg);
+		 
+		            context.fillStyle = randomColor();
+		            context.fillText(txt, 0, 0);
+		 
+		            context.rotate(-deg);
+		            context.translate(-x, -y);
+		        }
+		        for (var i = 0; i <= 5; i++) { //验证码上显示线条
+		            context.strokeStyle = randomColor();
+		            context.beginPath();
+		            context.moveTo(Math.random() * canvas_width, Math.random() * canvas_height);
+		            context.lineTo(Math.random() * canvas_width, Math.random() * canvas_height);
+		            context.stroke();
+		        }
+		        for (var i = 0; i <= 30; i++) { //验证码上显示小点
+		            context.strokeStyle = randomColor();
+		            context.beginPath();
+		            var x = Math.random() * canvas_width;
+		            var y = Math.random() * canvas_height;
+		            context.moveTo(x, y);
+		            context.lineTo(x + 1, y + 1);
+		            context.stroke();
+		        }
+		    }
+		    function randomColor() {//得到随机的颜色值
+		        var r = Math.floor(Math.random() * 256);
+		        var g = Math.floor(Math.random() * 256);
+		        var b = Math.floor(Math.random() * 256);
+		        return "rgb(" + r + "," + g + "," + b + ")";
+		    }
+
+
+			layui.use('form', function(){
+		  		var form = layui.form;
+		  		var $ = layui.$;
+		  		//监听提交
+			    form.on('submit(formDemo)', function(data){
+			    	var verify = $('#verify').val().toLowerCase();
+			    	var num = show_num.join("");
+			    	if(verify == num){
+			    		$.ajax({
+								url: "http://101.42.154.161:5000/register",
+								type: "POST",
+								data:{"username":data.field.username,"password":data.field.password,"phone":data.field.phone,"email":data.field.email},
+								dataType: "json",
+								success: function(data){
+									if(data['status']=="success"){
+									    layer.alert("注册成功！",{icon:4},{time:2,});
+									    setTimeout(function () {
+										    window.location.href="http://101.42.154.161:5000/";
+                                        },2000);
+										}
+									else{
+										layer.alert("该用户名已被注册！",{icon:5});
+									}
+								}
+						});
+			    	}else{
+						layer.alert("验证码错误，请重新输入！",{icon:5});
+			    		draw(show_num);
+			    	}
+			    	
+			    	return false;
+			  	});
+				
+			});
+		</script>
+
+	</body>
+</html>
